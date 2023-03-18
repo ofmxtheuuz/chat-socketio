@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat On-line</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+
+</head>
+<body>
+  <div class="container mt-5">
+    <div class="d-flex">
+      <input type="text" name="input" id="input_message" class="form-control" placeholder="Message">
+      <input type="submit" value="Enviar" id="send_message" class="btn btn-success">
+    </div>
+    <ul id="messages"></ul>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js" integrity="sha512-pumBsjNRGGqkPzKHndZMaAG+bir374sORyzM3uulLV14lN5LyykqNk8eEeUlUkB3U0M4FApyaHraT65ihJhDpQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.js" integrity="sha512-xbQU0+iHqhVt7VIXi6vBJKPh3IQBF5B84sSHdjKiSccyX/1ZI7Vnkt2/8y8uruj63/DVmCxfUNohPNruthTEQA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    const socket = io()
+    $("#send_message").click(e => {
+      let message = $("#input_message").val();
+      $("#input_message").val("")
+      socket.emit("client_message", {id: socket.id, message})
+    })
+
+    socket.on("client_message_server", e => {
+      const li = document.createElement("li")
+      if(e.socket_id !== socket.id) {
+        const text = document.createTextNode(`${e.socket_id}: ${e.message}`)
+        li.appendChild(text)
+      } else {
+        const text = document.createTextNode(`Eu: ${e.message}`)
+        li.appendChild(text)
+      }
+      document.querySelector("#messages").appendChild(li)
+    })
+    socket.on("response_message", e => console.log("A mensagem enviada foi recebida pelo servidor!"))
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD" crossorigin="anonymous"></script>  
+</body>
+</html>
